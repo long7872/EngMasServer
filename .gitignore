@@ -1,0 +1,29 @@
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env files
+.env
+*.env
+!.env.example
+
+# Logs
+logs/
+*.log
+log.txt
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# Railway build cache (nếu có)
+railway/
+
+# Build folders (nếu bạn build ra dist/)
+dist/
+build/
