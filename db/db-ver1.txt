@@ -1,0 +1,111 @@
+-- USERS
+CREATE TABLE users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    privilege ENUM('user', 'admin') NOT NULL,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
+    facebook VARCHAR(255),
+    status VARCHAR(50)
+);
+
+-- CHALLENGES
+CREATE TABLE challenges (
+    user_id INT,
+    score INT,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+-- USER FRIEND
+CREATE TABLE user_friend (
+    u_f_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    friend_id INT,
+    status ENUM('pending', 'accepted', 'blocked') DEFAULT 'pending',
+    timestamp DATE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (friend_id) REFERENCES users(user_id),
+    CHECK (user_id < friend_id)
+);
+
+-- API (Parent)
+CREATE TABLE api (
+    api_id INT PRIMARY KEY AUTO_INCREMENT,
+    type ENUM('vocab', 'grammar') NOT NULL
+);
+
+-- VOCAB API (Child)
+CREATE TABLE vocab_api (
+    api_id INT PRIMARY KEY,
+    word VARCHAR(255) NOT NULL,
+    meaning TEXT,
+    pronunciation VARCHAR(255),
+    audio_path VARCHAR(255),
+    example TEXT,
+    FOREIGN KEY (api_id) REFERENCES api(api_id)
+);
+
+-- GRAMMAR API (Child)
+CREATE TABLE grammar_api (
+    api_id INT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    explanation TEXT,
+    level ENUM('beginner', 'inter', 'advan'),
+    example TEXT,
+    FOREIGN KEY (api_id) REFERENCES api(api_id)
+);
+
+-- USER LEARNING
+CREATE TABLE user_learning (
+    u_l_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    api_id INT,
+    status VARCHAR(50),
+    timestamp DATE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (api_id) REFERENCES api(api_id)
+);
+
+-- BADGES
+CREATE TABLE badges (
+    badge_id INT PRIMARY KEY AUTO_INCREMENT,
+    type ENUM('learning', 'winning', 'beginner course', 'inter course', 'advan course'),
+    image_path VARCHAR(255)
+);
+
+-- USER BADGE
+CREATE TABLE user_badge (
+    user_badge_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    badge_id INT,
+    quantity INT,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (badge_id) REFERENCES badges(badge_id)
+);
+
+-- COURSES
+CREATE TABLE course (
+    course_id INT PRIMARY KEY AUTO_INCREMENT,
+    course_name VARCHAR(255),
+    type ENUM('beginner', 'inter', 'advan')
+);
+
+-- COURSE CONTENT
+CREATE TABLE course_content (
+    c_c_id INT PRIMARY KEY AUTO_INCREMENT,
+    course_id INT,
+    api_id INT,
+    FOREIGN KEY (course_id) REFERENCES course(course_id),
+    FOREIGN KEY (api_id) REFERENCES api(api_id)
+);
+
+-- USER COURSE
+CREATE TABLE user_course (
+    u_c_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    c_c_id INT,
+    status ENUM('notstarted', 'inprogress', 'done'),
+    timestamp DATE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (c_c_id) REFERENCES course_content(c_c_id)
+);
