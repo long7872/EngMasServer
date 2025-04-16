@@ -109,7 +109,7 @@ async function insertWord(wordData) {
 }
 
 async function main() {
-  const filePath = path.join(__dirname, "../data/words_alpha.txt");
+  const filePath = path.join(__dirname, "../data/words_alpha2.txt");
   const lines = fs.readFileSync(filePath, "utf-8")
     .split("\n")
     .map(line => line.trim())
