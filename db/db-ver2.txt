@@ -1,0 +1,149 @@
+-- CREATE DATABASE
+CREATE DATABASE IF NOT EXISTS engmas CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE engmas;
+
+-- USERS
+CREATE TABLE users (
+    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    privilege ENUM('user', 'admin') NOT NULL,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(255),
+    facebook VARCHAR(255),
+    status VARCHAR(50)
+);
+
+-- CHALLENGES
+CREATE TABLE challenges (
+    user_id INT,
+    score INT,
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+-- USER FRIEND
+CREATE TABLE user_friend (
+    u_f_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    friend_id INT,
+    status ENUM('pending', 'accepted', 'blocked') DEFAULT 'pending',
+    timestamp DATE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (friend_id) REFERENCES users(user_id),
+    CHECK (user_id < friend_id)
+);
+
+-- API (Parent)
+CREATE TABLE api (
+    api_id INT PRIMARY KEY AUTO_INCREMENT,
+    type ENUM('vocab', 'grammar') NOT NULL
+);
+
+-- VOCAB API
+CREATE TABLE vocab_api (
+    api_id INT PRIMARY KEY,
+    word VARCHAR(255) NOT NULL,
+    phonetic VARCHAR(255),
+    FOREIGN KEY (api_id) REFERENCES api(api_id)
+);
+
+CREATE TABLE phonetics (
+    phonetic_id INT PRIMARY KEY AUTO_INCREMENT,
+    vocab_id INT,
+    text VARCHAR(255),
+    audio VARCHAR(500),
+    FOREIGN KEY (vocab_id) REFERENCES vocab_api(api_id) ON DELETE CASCADE
+);
+
+CREATE TABLE meanings (
+    meaning_id INT PRIMARY KEY AUTO_INCREMENT,
+    vocab_id INT,
+    part_of_speech VARCHAR(50),
+    FOREIGN KEY (vocab_id) REFERENCES vocab_api(api_id) ON DELETE CASCADE
+);
+
+CREATE TABLE definitions (
+    def_id INT PRIMARY KEY AUTO_INCREMENT,
+    meaning_id INT,
+    definition TEXT,
+    example TEXT,
+    FOREIGN KEY (meaning_id) REFERENCES meanings(meaning_id) ON DELETE CASCADE
+);
+
+CREATE TABLE synonyms (
+    synonym_id INT PRIMARY KEY AUTO_INCREMENT,
+    meaning_id INT,
+    synonym VARCHAR(255),
+    FOREIGN KEY (meaning_id) REFERENCES meanings(meaning_id) ON DELETE CASCADE
+);
+
+CREATE TABLE antonyms (
+    antonym_id INT PRIMARY KEY AUTO_INCREMENT,
+    meaning_id INT,
+    antonym VARCHAR(255),
+    FOREIGN KEY (meaning_id) REFERENCES meanings(meaning_id) ON DELETE CASCADE
+);
+
+-- GRAMMAR API (Child)
+CREATE TABLE grammar_api (
+    api_id INT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    explanation TEXT,
+    level ENUM('beginner', 'intermediate', 'advance'),
+    example TEXT,
+    FOREIGN KEY (api_id) REFERENCES api(api_id)
+);
+
+-- USER LEARNING
+CREATE TABLE user_learning (
+    u_l_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    api_id INT,
+    status VARCHAR(50),
+    timestamp DATE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (api_id) REFERENCES api(api_id)
+);
+
+-- BADGES
+CREATE TABLE badges (
+    badge_id INT PRIMARY KEY AUTO_INCREMENT,
+    type ENUM('learning', 'winning', 'beginner course', 'intermediate course', 'advance course'),
+    image_path VARCHAR(255)
+);
+
+-- USER BADGE
+CREATE TABLE user_badge (
+    user_badge_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    badge_id INT,
+    quantity INT,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (badge_id) REFERENCES badges(badge_id)
+);
+
+-- COURSES
+CREATE TABLE course (
+    course_id INT PRIMARY KEY AUTO_INCREMENT,
+    course_name VARCHAR(255),
+    type ENUM('beginner', 'inter', 'advan')
+);
+
+-- COURSE CONTENT
+CREATE TABLE course_content (
+    c_c_id INT PRIMARY KEY AUTO_INCREMENT,
+    course_id INT,
+    api_id INT,
+    FOREIGN KEY (course_id) REFERENCES course(course_id),
+    FOREIGN KEY (api_id) REFERENCES api(api_id)
+);
+
+-- USER COURSE
+CREATE TABLE user_course (
+    u_c_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id INT,
+    c_c_id INT,
+    status ENUM('notstarted', 'inprogress', 'done'),
+    timestamp DATE,
+    FOREIGN KEY (user_id) REFERENCES users(user_id),
+    FOREIGN KEY (c_c_id) REFERENCES course_content(c_c_id)
+);
