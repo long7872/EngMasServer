@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-dotenv.config({ path: './local.env' });
+const dotenv = require('dotenv');
+dotenv.config({ path: 'server.env' });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,6 +12,8 @@ app.use(express.json());
 // Routes
 const userRoutes = require('./routes/user.routes');
 app.use('/users', userRoutes);
+const vocabRoutes = require('./routes/vocab.routes');
+app.use('/vocabs', vocabRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server đang chạy tại http://localhost:${PORT}`);
