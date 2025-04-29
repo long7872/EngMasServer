@@ -8,6 +8,7 @@ router.get('/', (req, res) => {
     if (err) return res.status(500).json({ error: err });
     res.json(results); // trả về danh sách user
   });
+  // console.log("Return:", res.json(results));
 });
 
 // GET user
@@ -21,6 +22,7 @@ router.get('/:user_id', (req, res) => {
 
     res.json(results[0]);
   });
+  // console.log("Return:", res.json(results));
 });
 
 // PUT cập nhật status user
