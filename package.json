@@ -15,6 +15,7 @@
     "dotenv": "^16.4.7",
     "express": "^5.1.0",
     "fs": "^0.0.1-security",
+    "google-translate-api-x": "^10.7.2",
     "mysql2": "^3.14.0"
   }
 }
