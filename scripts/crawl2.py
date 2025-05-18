@@ -1,3 +1,4 @@
+import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -7,9 +8,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from bs4 import BeautifulSoup
+import os
 import time
 
-def interact_with_show_button(url):
+# Hàm để lấy câu hỏi và câu trả lời từ mỗi trang và lưu vào file riêng biệt
+def interact_with_show_button(url, file_index):
     # Thiết lập driver cho Selenium
     options = Options()
     options.headless = False  # Nếu bạn muốn xem trình duyệt chạy
@@ -55,17 +58,22 @@ def interact_with_show_button(url):
         time.sleep(1)
 
     finally:
-        # Bước 2: Sau khi đã nhấn nút "Show", lấy dữ liệu câu hỏi và câu trả lời
-        extract_data(driver.page_source)
+        # Sau khi đã nhấn nút "Show", lấy dữ liệu câu hỏi và câu trả lời
+        extract_data(driver.page_source, file_index)
         driver.quit()  # Đảm bảo đóng trình duyệt sau khi hoàn thành
 
 
-def extract_data(page_source):
+def extract_data(page_source, file_index):
     # Dùng BeautifulSoup để phân tích mã nguồn trang web đã tải
     soup = BeautifulSoup(page_source, 'html.parser')
 
     # Mở file để ghi câu hỏi và câu trả lời vào
-    with open("questions_answers14.txt", "w", encoding="utf-8") as file:
+    data_directory = os.path.join(os.path.dirname(__file__), "../data")
+    os.makedirs(data_directory, exist_ok=True)  # Tạo thư mục nếu chưa tồn tại
+
+# Tiến hành ghi vào file
+    file_path = os.path.join(data_directory, f"questions_answers{file_index}.txt")
+    with open(file_path, "w", encoding="utf-8") as file:
         # Tìm tất cả các thẻ div với id="exercise"
         exercise_div = soup.find('div', id='exercise')
 
@@ -95,17 +103,17 @@ def extract_data(page_source):
         for exercise in exercises:
             # Trích xuất câu hỏi từ các phần tử span có class textPart
             question_parts = exercise.find_all('span', class_='textPart')
-            print(f"Question part: {question_parts}\n")
+            # print(f"Question part: {question_parts}\n")
             
             # Kiểm tra xem có bao nhiêu phần tử 'textPart'
             if len(question_parts) > 1:
                 # Nếu có nhiều hơn 1 phần tử 'textPart', nối chúng lại với nhau
                 question = ' [answer] '.join(part.get_text(strip=True) for part in question_parts)
-                print(f"Question > 1: {question}\n")
+                # print(f"Question > 1: {question}\n")
             else:
                 # Nếu chỉ có 1 phần tử 'textPart', thêm [answer] vào sau câu hỏi
                 question = question_parts[0].get_text(strip=True) + " [answer]"
-                print(f"Question with [answer]: {question}\n")
+                # print(f"Question with [answer]: {question}\n")
 
             # Tìm tất cả các thẻ span có style="color: rgb(28, 97, 99);"
             answer_parts = exercise.find_all('span', style="color: rgb(28, 97, 99); padding: 1px;")
@@ -126,9 +134,37 @@ def extract_data(page_source):
             file.write(f"Answer: {answer}\n")
             file.write("-" * 50 + "\n")
 
+# Đọc các liên kết bài tập từ file
+def read_links_from_file(file_path):
+    # Kiểm tra nếu file tồn tại
+    if not os.path.exists(file_path):
+        print(f"File không tồn tại: {file_path}")
+        return []
 
-# Ví dụ sử dụng
-url = "https://www.perfect-english-grammar.com/present-simple-exercise-14.html"
+    # Đọc các liên kết từ file
+    with open(file_path, "r", encoding="utf-8") as file:
+        links = file.readlines()
 
-# Bước 1: Tương tác với các nút Show (Nhấn vào Show để hiển thị câu trả lời)
-interact_with_show_button(url)
+    # Loại bỏ ký tự thừa như dấu xuống dòng và trả về danh sách các liên kết
+    return [link.strip() for link in links]
+
+# Đảm bảo thư mục ../data tồn tại
+data_directory = os.path.join(os.path.dirname(__file__), "../data")
+os.makedirs(data_directory, exist_ok=True)  # Tạo thư mục nếu chưa tồn tại
+
+# Đường dẫn đến file chứa các liên kết bài tập
+file_path = os.path.join(data_directory, "exercise_links.txt")
+
+# Lấy danh sách liên kết từ file
+exercise_links = read_links_from_file(file_path)
+
+# Kiểm tra các liên kết đã được đọc
+if not exercise_links:
+    print("Không có liên kết bài tập nào.")
+else:
+    print(f"Đã tìm thấy {len(exercise_links)} liên kết bài tập.")
+    
+    # Sử dụng các liên kết trong Selenium
+    for i, link in enumerate(exercise_links, start=1):
+        print(f"Đang xử lý bài tập {i}: {link}")
+        interact_with_show_button(link, i)  # Hàm của bạn xử lý từng bài tập

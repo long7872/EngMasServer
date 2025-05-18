@@ -1,3 +1,4 @@
+import os
 import requests
 from bs4 import BeautifulSoup
 
@@ -30,12 +31,22 @@ if response.status_code == 200:
         and not any(exclude in link['href'] for exclude in exclude_keywords)
     ]
     
-    # In ra các liên kết bài tập
-    for link in exercise_links:
-        # Đảm bảo đường dẫn là đầy đủ, nếu là đường dẫn tương đối
-        if link.startswith('/'):
-            link = f"https://www.perfect-english-grammar.com{link}"
-        print(link)
+    # Đảm bảo thư mục ../data tồn tại
+    data_directory = os.path.join(os.path.dirname(__file__), "../data")
+    os.makedirs(data_directory, exist_ok=True)  # Tạo thư mục nếu chưa tồn tại
+
+    # Định nghĩa đường dẫn file
+    file_path = os.path.join(data_directory, "exercise_links.txt")
+
+    # Ghi các liên kết vào file
+    with open(file_path, "w", encoding="utf-8") as file:
+        for link in exercise_links:
+            # Đảm bảo đường dẫn là đầy đủ, nếu là đường dẫn tương đối
+            if link.startswith('/'):
+                link = f"https://www.perfect-english-grammar.com{link}"
+            file.write(link + "\n")
+    
+    print(f"Đã lưu tất cả các liên kết bài tập vào file: {file_path}")
 
 else:
     print(f"Failed to retrieve content. Status code: {response.status_code}")

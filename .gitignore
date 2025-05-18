@@ -27,3 +27,7 @@ railway/
 # Build folders (nếu bạn build ra dist/)
 dist/
 build/
+
+# data
+data/grammar_question
+data/TOEIC

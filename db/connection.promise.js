@@ -1,6 +1,6 @@
 const mysql = require('mysql2/promise');
 const dotenv = require('dotenv');
-// dotenv.config({ path: './server.env' });
+
 dotenv.config({ path: './server.env' });
 
 const pool = mysql.createPool({
@@ -12,5 +12,19 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
 });
+
+async function testConnection() {
+  try {
+    const connection = await pool.getConnection();
+    console.log('✅ Kết nối database thành công!');
+    connection.release(); // Trả connection về pool
+  } catch (err) {
+    console.error('❌ Lỗi kết nối database:', err.message);
+    process.exit(1); // Dừng app nếu không kết nối được
+  }
+}
+
+// Gọi hàm test ngay khi load file
+testConnection();
 
 module.exports = pool;

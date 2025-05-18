@@ -12,10 +12,15 @@
   "dependencies": {
     "axios": "^1.8.4",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
+    "dotenv": "^16.5.0",
+    "dropbox": "^10.34.0",
     "express": "^5.1.0",
     "fs": "^0.0.1-security",
     "google-translate-api-x": "^10.7.2",
-    "mysql2": "^3.14.0"
+    "http": "^0.0.1-security",
+    "isomorphic-fetch": "^3.0.0",
+    "multer": "^1.4.5-lts.2",
+    "mysql2": "^3.14.0",
+    "socket.io": "^4.8.1"
   }
 }
