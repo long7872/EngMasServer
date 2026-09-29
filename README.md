@@ -38,6 +38,15 @@ EngMasServer provides the backend services for vocabulary and grammar learning, 
 | Integrations | Dropbox SDK, LanguageConfidence API, Axios | Profile image storage, speech assessment, and data-ingestion/translation scripts |
 | DevTools & data tooling | npm, Node.js watch mode, Python, `requirements.txt` | Dependency management, local development, and offline data preparation/import scripts |
 
+## Ecosystem Integration
+
+EngMasServer is the backend component of the two-part EngMas product ecosystem:
+
+- **Android client:** [EngMas](https://github.com/long7872/EngMas) consumes this server's REST endpoints for users, friendships, vocabulary, topics, courses, learning progress, and voice-analysis requests.
+- **Live backend:** [EngMasServer](https://github.com/long7872/EngMasServer) provides the public REST API at [engmasserver.onrender.com](https://engmasserver.onrender.com) and the Socket.IO transport used by online challenges.
+- **Firebase complement:** The mobile ecosystem uses Firebase Authentication and Firestore for identity and challenge-related documents, score, and user data. Those Firebase responsibilities are complementary to this Node.js/MySQL backend; Firebase is not directly initialized by the Server code in this repository.
+- **Client/server boundary:** REST is the source of truth for the server-managed learning resources and progress workflows, while Socket.IO carries transient, bidirectional online-challenge events. The current server keeps matchmaking state in process memory, whereas durable challenge records may be maintained by the client ecosystem's Firebase workflows.
+
 ## 4. System Architecture & Flow
 
 ```text
