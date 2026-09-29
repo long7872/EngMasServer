@@ -20,8 +20,9 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+.history
 
-# Railway build cache (nếu có)
+# Railway build cache
 railway/
 
 # Build folders (nếu bạn build ra dist/)
@@ -31,3 +32,4 @@ build/
 # data
 data/grammar_question
 data/TOEIC
+data/uploads
